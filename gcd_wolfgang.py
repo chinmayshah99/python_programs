@@ -25,8 +25,10 @@ def Ramanujan_sum(q, n):
 			sum_no = sum_no + np.exp((2 * 1j * np.pi * a * n) / q)
 	return sum_no
 
-# 
+# Wolfgang Schramm
 def Wolfgang_Schramm(num1, num2):
+	if num1 > num2:
+		num1, num2 = num2, num1  # making sure the both loop runs for minimum time
 	term = 0
 	num1_factors = get_factors(num1)
 
@@ -38,9 +40,8 @@ def Wolfgang_Schramm(num1, num2):
 			term2 = term2 + Ramanujan_sum(d, k)/d
 
 		term = term + (term1 * term2)
-		print(term)
+
 	return round(np.absolute(term))
 
 
-# ensure num2 > num1 to minimze computation (line 31)
-print(Wolfgang_Schramm(10023, 1222321))
+print(Wolfgang_Schramm(1222321, 10023))
