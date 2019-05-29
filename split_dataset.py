@@ -23,12 +23,12 @@
 import os
 import random
 import shutil
+import argparse
+import zipfile
 
-input_directory = 'images'
-split = 0.3  # test percentage
 
 
-def create_train(dir_name, file_list):
+def create_train(input_directory ,dir_name, file_list):
     train_directory = 'train' + '_' + input_directory
 
     if not os.path.exists(train_directory):
@@ -45,7 +45,7 @@ def create_train(dir_name, file_list):
         shutil.move(src, dest)
 
 
-def create_test(dir_name, file_list):
+def create_test(input_directory ,dir_name, file_list):
     test_directory = 'test' + '_' + input_directory
 
     if not os.path.exists(test_directory):
@@ -61,8 +61,35 @@ def create_test(dir_name, file_list):
         dest = test_folder + '/' + file_list[i]
         shutil.move(src, dest)
 
+def extract_zip(input_zip):
+    print('extracting ' + input_zip)
+    zip_ref = zipfile.ZipFile(input_zip, 'r')
+    zip_ref.extractall('/')
+    zip_ref.close()
+    print('extracted!')
+
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("filename",
+                        help="Name of zip file/ directory name")
+    parser.add_argument("-z", "--zip", action="store_true",
+                        help="True if a zip file")
+    parser.add_argument("-t", "--test", default = 0.3,
+                        help="Test split percentage")
+
+    args = parser.parse_args()
+
+    if args.zip:
+        extract_zip(args.filename)
+        input_directory = (args.filename).rsplit('.', 1)[0]
+
+    else:
+        if os.path.isdir(args.filename):
+            input_directory = args.filename
+        else:
+            raise NotADirectoryError
+
     for root, dirs, files in os.walk(input_directory):
         for dir in dirs:
             print(dir)
@@ -70,7 +97,7 @@ if __name__ == "__main__":
                 train_list = []
                 test_list = []
                 total_files = list(range(len(files1)))
-                test_list_index = random.sample(range(1, len(files1)), int(split * len(files1)))
+                test_list_index = random.sample(range(1, len(files1)), int(args.test * len(files1)))
                 train_list_index = list(set(total_files) - set(test_list_index))
 
                 for i in test_list_index:
@@ -79,7 +106,7 @@ if __name__ == "__main__":
                 for i in train_list_index:
                     train_list.append(files1[i])
 
-                create_train(dir, train_list)
-                create_test(dir, test_list)
+                create_train(input_directory ,dir, train_list)
+                create_test(input_directory ,dir, test_list)
 
     shutil.rmtree(input_directory)  # removes the i/p folder
