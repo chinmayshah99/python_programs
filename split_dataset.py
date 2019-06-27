@@ -19,6 +19,14 @@
 
     At the end, removes the input directory, i.e., `data` in this case
 '''
+'''
+    Usage:
+    Zip file - python3 split_dataset.py -z image.zip    
+    Direcotry - python3 split_dataset.py image
+    Add split %(directory) - python3 split_dataset.py -t 0.4 image
+    Add split %(zip) - python3 split_dataset.py -z -t 0.4 image.zip
+    
+'''
 
 import os
 import random
@@ -97,7 +105,7 @@ if __name__ == "__main__":
                 train_list = []
                 test_list = []
                 total_files = list(range(len(files1)))
-                test_list_index = random.sample(range(1, len(files1)), int(args.test * len(files1)))
+                test_list_index = random.sample(range(1, len(files1)), int(float(args.test) * len(files1)))
                 train_list_index = list(set(total_files) - set(test_list_index))
 
                 for i in test_list_index:
